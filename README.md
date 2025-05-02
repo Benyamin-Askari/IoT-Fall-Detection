@@ -73,40 +73,50 @@ GYRO_THRESHOLD: Minimum gyroscope magnitude (in rad/s) to consider a potential f
 ACCEL_RATE_THRESHOLD: Minimum rate of change of acceleration magnitude (in m/s² per loop iteration) to indicate a rapid change associated with a fall.
 GYRO_RATE_THRESHOLD: Minimum rate of change of gyroscope magnitude (in rad/s per loop iteration) to indicate a rapid rotation during a fall.
 HIGH_ACC_DURATION: Minimum duration (in milliseconds) that the acceleration must stay above ACC_THRESHOLD to trigger the more detailed fall detection logic.
+
+
 3.3 Timing
 FALL_COOLDOWN: The minimum time (in milliseconds) that must pass after a fall detection before another fall can be detected. This prevents repeated triggers for a single event.
+
 3.4 LED Pin
 LED_PIN: Defines the Arduino pin connected to an indicator LED. The code is currently set to 25, which is the built-in LED pin on the Arduino Uno WiFi Rev2. Adjust this if you are using a different board or LED connection.
+
 3.5 ThingSpeak Channel
 thingSpeakChannelId: Your specific ThingSpeak channel ID where fall notifications will be sent.
 thingSpeakApiKey: Your ThingSpeak Write API Key for the specified channel.
 Installation and Setup
+
 4.1 Arduino IDE and Libraries
 Ensure you have the Arduino IDE installed.
 Install the necessary libraries through the Arduino Library Manager:
 Arduino_LSM6DS3 (for the IMU sensor)
 WiFiNINA (for WiFi connectivity on boards like Uno WiFi Rev2)
 ThingSpeak (for interacting with the ThingSpeak platform)
+
 4.2 _passwords.h File
 Create a new tab in your Arduino sketch in the Arduino IDE Cloud.
 Name the tab exactly _passwords.h (note the leading underscore).
 Copy and paste the content from the Configuration - Credentials section into this tab, replacing the placeholder values with your actual credentials.
+
 4.3 ThingSpeak Setup
 Create an account on ThingSpeak.com.
 Create a new channel.
 Note down your Channel ID.
 Go to the "API Keys" tab of your channel and note down your Write API Key.
 Functionality
+
 5.1 Initialization
 Initializes serial communication for debugging.
 Configures the LED_PIN as an output and turns the LED off.
 Initializes the LSM6DS3 IMU sensor.
 Connects to the configured WiFi network using the credentials from _passwords.h.
 Initializes the ThingSpeak client.
+
 5.2 Data Acquisition
 In the loop() function, the script continuously reads acceleration and gyroscope data from the IMU.
 It calculates the magnitude of the acceleration and gyroscope vectors.
 It also calculates the rate of change of these magnitudes.
+
 5.3 Fall Detection Logic
 The fall detection logic involves the following steps:
 
@@ -114,11 +124,14 @@ High Acceleration Detection: If the acceleration magnitude exceeds ACC_THRESHOLD
 Sustained High Acceleration: If the high acceleration persists for longer than HIGH_ACC_DURATION, the script proceeds to check other fall indicators.
 Threshold Checks: Within the sustained high acceleration period, the script checks if the gyroscope magnitude, acceleration rate of change, and gyroscope rate of change all exceed their respective thresholds (GYRO_THRESHOLD, ACCEL_RATE_THRESHOLD, GYRO_RATE_THRESHOLD).
 Fall Confirmation: If all these conditions are met, a fall is detected.
+
 5.4 Alerting
 Upon fall detection, the onboard LED connected to LED_PIN is turned on for 5 seconds as a local alert.
 A ">>> FALL DETECTED! &lt;&lt;&lt;" message is printed to the serial monitor.
+
 5.5 ThingSpeak Reporting
 When a fall is detected, the script attempts to send a notification to your ThingSpeak channel, writing the value "Fall Detected" to Field 1.
 It prints a success or failure message to the serial monitor based on the ThingSpeak update response.
+
 5.6 Cooldown Mechanism
 After a fall is detected and reported, a FALL_COOLDOWN period is enforced. During this time, new fall detections are ignored to prevent false positives from the immediate aftermath of a fall.
